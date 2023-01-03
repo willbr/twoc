@@ -1,4 +1,6 @@
+include_lib("stdio.h")
+
 def main() -> int:
-    print("hi")
+    puts("hi")
     return 0
 
