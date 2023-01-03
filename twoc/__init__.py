@@ -3,7 +3,9 @@ from rich.console import Console
 from rich.traceback import install
 from pathlib import Path
 
-print("init")
+"""
+remove references to ie/
+"""
 
 install(show_locals=True)
 
@@ -68,6 +70,9 @@ class CompilationUnit():
         self.filenames.append(filename)
         prog = unwind_file(filename)
 
+        x = prog.pop(0)
+        assert x == 'module'
+
         for x in prog:
             head, *args = x
             if head in ['def', 'func-decl']:
@@ -109,9 +114,9 @@ class CompilationUnit():
 
         if head == 'def':
             self.compile_proc(*args)
-        elif head == 'func-decl':
+        elif head == 'func_decl':
             self.compile_func_decl(*args)
-        elif head == 'include-lib':
+        elif head == 'include_lib':
             self.top_level.append(self.compile_lib(*args))
         elif head == 'import':
             self.compile_import(*args)
@@ -137,48 +142,7 @@ class CompilationUnit():
             assert False
 
 
-    def compile_func_decl(self, fn_name, params, body):
-        cbody = []
-        cparams = []
-
-        if not is_atom(fn_name):
-            if fn_name[0] == 'ie/neoteric':
-                assert len(fn_name) == 3
-                raw_params = fn_name[2]
-                fn_name    = fn_name[1]
-            else:
-                assert False
-
-            if raw_params[0] == 'ie/infix':
-                raw_params = split_on_symbol(raw_params[1:], ',')
-                params = self.compile_params(raw_params)
-            else:
-                assert False
-
-        returns, body = split_newline(spec)
-
-        n = len(returns)
-        if n == 0:
-            returns = 'void'
-            pass
-        elif n == 1:
-            returns = returns[0]
-        else:
-            assert False
-
-        if body:
-            if body[0][0] == 'params':
-                assert params == []
-                params = compile_params(body[0][1:])
-                body = body[1:]
-
-            if spec[0][0] == 'returns':
-                assert returns == None
-                returns = compile_returns(body[0][1:])
-                body = body[1:]
-            elif returns == None:
-                returns = 'void'
-
+    def compile_func_decl(self, fn_name, params, returns, body):
         self.functions[fn_name] = [params, returns, body]
 
 
@@ -204,23 +168,13 @@ class CompilationUnit():
         assert False
 
 
-    def compile_proc(self, fn_name, *spec):
-        if not is_atom(fn_name):
-            if fn_name[0] == 'ie/neoteric':
-                assert len(fn_name) == 3
-                raw_params = fn_name[2]
-                fn_name    = fn_name[1]
-            else:
-                assert False
-
-        [params, returns, body] = self.functions[fn_name]
-
+    def compile_proc(self, fn_name, params, returns, body):
         cbody = [self.compile_statement(x) for x in body]
-
         self.functions[fn_name] = [params, returns, cbody]
 
 
     def compile_statement(self, x):
+        #print(x)
 
         if is_atom(x):
             if x == 'ie/newline':
@@ -531,7 +485,7 @@ class CompilationUnit():
 
 
     def compile_expression(self, x, depth=0):
-        # print(f"{x=}")
+        #print(f"{x=}")
         nx = self.macro_expand(x)
         # print(f"{nx=}")
         # print()
