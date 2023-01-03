@@ -845,5 +845,7 @@ def is_string_literal(s):
     return s[0] == '"' and s[-1] == '"'
 
 def is_atom(x):
+    if type(x) is str:
+        return True
     return not hasattr(x, '__iter__')
 
