@@ -609,7 +609,9 @@ class CompilationUnit():
             return '&&'
         elif name == 'or':
             return '||'
-
+        elif name[0] == '"':
+            x = name.replace('\n', '\\n')
+            return x
 
         x = name.replace('-', '_')
         if x[0] == ':':
