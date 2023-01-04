@@ -594,6 +594,7 @@ class CompilationUnit():
 
 
     def mangle(self, name):
+        #print(f"{name=}")
         t = type(name)
 
         if t != str:
@@ -691,7 +692,8 @@ def print_func_decl(lines, name, params, returns, sep, end):
         cparams = ', '.join(params)
     else:
         cparams = 'void'
-    code = f"{returns}{sep}{name}({cparams}){end}"
+    creturns = 'void' if returns == None else returns
+    code = f"{creturns}{sep}{name}({cparams}){end}"
     *body, final = code.split('\n')
 
     for l in body:
