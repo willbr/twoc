@@ -146,13 +146,9 @@ class CompilationUnit():
         self.functions[fn_name] = [params, returns, body]
 
 
-    def compile_lib(self, *args):
-        assert False
-        first_line, body = split_newline(args)
-        assert len(first_line) == 1
-        assert len(body) == 0
-        name = first_line[0].strip('"')
-        clib = f"#include <{name}>"
+    def compile_lib(self, name):
+        cname = name.strip('"')
+        clib = f"#include <{cname}>"
         return clib
 
 
