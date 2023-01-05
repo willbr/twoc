@@ -365,6 +365,13 @@ class CompilationUnit():
             return r
         assert False
 
+    def compile_aug_assign_macro(self, target, op, value):
+        if op == '+':
+            r = ['+=', target, value]
+        else:
+            assert False
+        return r
+
     
     def parse_format_string(self, fmt, append_newline=False):
         assert fmt[0] == '"' and fmt[-1] == '"'
@@ -418,6 +425,8 @@ class CompilationUnit():
             return self.compile_fprintln_macro(*rest)
         elif head == 'compare':
             return self.compile_compare_macro(*rest)
+        elif head == 'aug_assign':
+            return self.compile_aug_assign_macro(*rest)
 
         while head in ['ie/prefix', 'ie/infix', 'ie/postfix', 'ie/neoteric']:
             if head == 'ie/prefix':
