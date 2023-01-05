@@ -1,5 +1,5 @@
 all:
-	python -m twoc example.c.py
+	python -m twoc tests\while.c.py
 
 wall:
 	watchexec -cr "make all"

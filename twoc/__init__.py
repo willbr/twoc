@@ -2,8 +2,8 @@ from unwind import unwind_file
 from rich.console import Console
 from rich.traceback import install
 from pathlib import Path
-
 """
+remove split_newline
 remove references to ie/
 """
 
@@ -147,6 +147,7 @@ class CompilationUnit():
 
 
     def compile_lib(self, *args):
+        assert False
         first_line, body = split_newline(args)
         assert len(first_line) == 1
         assert len(body) == 0
@@ -177,42 +178,26 @@ class CompilationUnit():
         #print(x)
 
         if is_atom(x):
-            if x == 'ie/newline':
-                return ''
-            else:
-                assert False
+            assert False
 
-        head, *rest = x
-        args, body = split_newline(rest)
-
-        if args == []:
-            pass
-        elif args[0] == "=":
-            args = [head, ['ie/infix', *args[1:]]]
-            head = '='
-
-        if args == []:
-            pass
-        elif args[0] in self.infix_symbols:
-            nx = transform_infix([head] + args)
-            if is_atom(nx):
-                return nx
-            head, *args = nx
+        head, *args = x
 
         if head == 'while':
-            return self.compile_while(args, body)
+            return self.compile_while(*args)
         elif head == 'for':
-            return self.compile_for(args, body)
+            return self.compile_for(args, args)
         elif head == 'var':
-            return self.compile_var(args, body) + ";"
+            return self.compile_var(*args) + ";"
         elif head == 'if':
             return self.compile_if(args, body)
         elif head == 'comment':
             return compile_comment(*args, *body)
         elif head == 'return':
             return self.compile_return_statement(*args, *body)
+        elif head == 'assign':
+            ce = self.compile_expression(['=', *args]) + ';'
+            return ce
 
-        assert body == [] or body == ()
         ce = self.compile_expression([head, *args])
         if head in ['include-lib']:
             return ce
@@ -230,12 +215,13 @@ class CompilationUnit():
 
 
     def compile_while(self, pred, body):
-        cpred = self.compile_expression(transform_infix(pred))
+        cpred = self.compile_expression(pred)
         cbody = [self.compile_statement(s) for s in body]
         return f"while ({cpred})", cbody
 
 
     def compile_for(self, header, body):
+        assert False
         init, pred, step =split_on_symbol(header, ';')
         cinit = self.compile_expression(transform_infix(init))
         cpred = self.compile_expression(transform_infix(pred))
@@ -245,6 +231,7 @@ class CompilationUnit():
 
 
     def compile_typedef(self, type_name, *body):
+        assert False
         type_spec, rest = split_newline(body)
         assert rest == ()
         decl = "typedef " + self.compile_var_decl(type_name, type_spec) + ";"
@@ -378,6 +365,12 @@ class CompilationUnit():
         print_args.insert(0, file)
         return ['printf', *print_args]
 
+    def compile_compare_macro(self, left, ops, comparators):
+        if len(ops) == 1:
+            r = [ops[0], left, comparators[0]]
+            return r
+        assert False
+
     
     def parse_format_string(self, fmt, append_newline=False):
         assert fmt[0] == '"' and fmt[-1] == '"'
@@ -393,8 +386,7 @@ class CompilationUnit():
                 lhs, rhs = rhs, ''
             a, text = lhs.split("}")
             t, fmt = a.rsplit(" ", 1)
-            v = promote_token(t)
-            vargs.append(v)
+            vargs.append(t)
 
             if fmt[0] == '=':
                 template.append(f"{v}=")
@@ -430,6 +422,8 @@ class CompilationUnit():
             return self.compile_fprint_macro(*rest)
         elif head == 'fprintln':
             return self.compile_fprintln_macro(*rest)
+        elif head == 'compare':
+            return self.compile_compare_macro(*rest)
 
         while head in ['ie/prefix', 'ie/infix', 'ie/postfix', 'ie/neoteric']:
             if head == 'ie/prefix':
@@ -499,9 +493,10 @@ class CompilationUnit():
         # print(x)
         head, *rest = nx
 
-        args, body = split_newline(rest)
-        assert body == ()
-        cargs = [self.compile_expression(a, depth+1) for a in args]
+        if head == 'compare':
+            return self.compile_compare(*rest)
+
+        cargs = [self.compile_expression(a, depth+1) for a in rest]
 
         if head in self.infix_symbols:
             # print(head, cargs)
@@ -762,18 +757,6 @@ def transform_infix(x):
         return transformed_sections[0]
     else:
         return transformed_sections
-
-
-def split_newline(x):
-    try:
-        pos = x.index('ie/newline')
-        lhs = x[:pos]
-        rhs = x[pos+1:]
-    except ValueError:
-        lhs = x
-        rhs = ()
-    finally:
-        return lhs, rhs
 
 
 def print_block(lines, body, depth):
