@@ -182,8 +182,6 @@ class CompilationUnit():
             return self.compile_while(*args)
         elif head == 'for':
             return self.compile_for(args, args)
-        elif head == 'var':
-            return self.compile_var(*args) + ";"
         elif head == 'if':
             return self.compile_if(args, body)
         elif head == 'comment':
@@ -193,6 +191,8 @@ class CompilationUnit():
         elif head == 'assign':
             ce = self.compile_expression(['=', *args]) + ';'
             return ce
+        elif head == 'ann_assign':
+            return self.compile_var(*args) + ";"
 
         ce = self.compile_expression([head, *args])
         if head in ['include-lib']:
@@ -201,9 +201,7 @@ class CompilationUnit():
             return ce + ";"
 
 
-    def compile_var(self, args, body):
-        assert body == []
-        var_name, var_type, var_value = args
+    def compile_var(self, var_name, var_type, var_value):
         assert is_atom(var_name)
         xtype = self.macro_expand(var_type)
         decl = self.compile_var_decl(var_name, xtype, var_value)
