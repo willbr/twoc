@@ -1,4 +1,7 @@
+include_lib("stdio.h")
+
 def main():
-    i = 0
+    i:int = 0
     while i < 10:
-        print("{i d}")
+        print("{i d}\n")
+        i += 1
