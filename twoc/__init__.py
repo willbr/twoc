@@ -186,7 +186,7 @@ class CompilationUnit():
         elif head == 'for':
             return self.compile_for(args, args)
         elif head == 'if':
-            return self.compile_if(args, body)
+            return self.compile_if(*args)
         elif head == 'comment':
             return compile_comment(*args, *body)
         elif head == 'return':
@@ -307,7 +307,8 @@ class CompilationUnit():
 
 
     def compile_if(self, pred, body):
-        cpred = self.compile_expression(transform_infix(pred))
+        npred = self.macro_expand(pred)
+        cpred = self.compile_expression(npred)
         cbody = [self.compile_statement(s) for s in body]
         return f"if ({cpred})", cbody
 
