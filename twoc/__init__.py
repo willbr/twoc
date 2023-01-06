@@ -227,9 +227,17 @@ class CompilationUnit():
                     pred = ['<', target, stop]
                     step = ['+=', target, 1]
                 case ['range', start, stop]:
-                    assert False
+                    init = ['=', target, start]
+                    pred = ['<', target, stop]
+                    step = ['+=', target, 1]
                 case ['range', start, stop, step]:
-                    assert False
+                    init = ['=', target, start]
+                    pred = ['<', target, stop]
+                    assert step != 0
+                    if step > 0:
+                        step = ['+=', target, step]
+                    else:
+                        step = ['-=', target, abs(step)]
                 case _:
                     assert False
         else:
