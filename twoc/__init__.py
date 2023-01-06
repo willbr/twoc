@@ -8,6 +8,7 @@ move CompilationUnit to it's own file
 remove split_newline
 remove references to ie/
 can I remove transform_infix
+remove keywords?
 """
 
 install(show_locals=True)
@@ -648,7 +649,7 @@ class CompilationUnit():
         elif name in self.infix_symbols:
             return name
 
-        x = name.replace('-', '_')
+        x = name
         if x[0] == ':':
             keyword = x[1:]
             if keyword not in self.keywords:
