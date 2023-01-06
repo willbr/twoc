@@ -22,11 +22,11 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-o", "--outfile")
     parser.add_argument("-run", help="run compiled source", action="store_true")
-    parser.add_argument("-print-ast", help="print ast", action="store_true")
+    parser.add_argument("-ast", help="print ast", action="store_true")
     parser.add_argument("file", nargs='+')
     args = parser.parse_args()
 
-    if args.print_ast:
+    if args.ast:
         for file in args.file:
             tree = unwind_file(file)
             print(tree)
