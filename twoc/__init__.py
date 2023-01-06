@@ -3,8 +3,11 @@ from rich.console import Console
 from rich.traceback import install
 from pathlib import Path
 """
+move Rope to it's own file
+move CompilationUnit to it's own file
 remove split_newline
 remove references to ie/
+can I remove transform_infix
 """
 
 install(show_locals=True)
