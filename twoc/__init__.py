@@ -637,6 +637,8 @@ class CompilationUnit():
         elif name[0] == '"':
             x = name.replace('\n', '\\n')
             return x
+        elif name in self.infix_symbols:
+            return name
 
         x = name.replace('-', '_')
         if x[0] == ':':
