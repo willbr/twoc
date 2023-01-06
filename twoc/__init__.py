@@ -184,7 +184,7 @@ class CompilationUnit():
         if head == 'while':
             return self.compile_while(*args)
         elif head == 'for':
-            return self.compile_for(args, args)
+            return self.compile_for(*args)
         elif head == 'if':
             return self.compile_if(*args)
         elif head == 'comment':
@@ -217,12 +217,29 @@ class CompilationUnit():
         return f"while ({cpred})", cbody
 
 
-    def compile_for(self, header, body):
-        assert False
-        init, pred, step =split_on_symbol(header, ';')
-        cinit = self.compile_expression(transform_infix(init))
-        cpred = self.compile_expression(transform_infix(pred))
-        cstep = self.compile_expression(transform_infix(step))
+    def compile_for(self, target, iter, body, orelse):
+        assert orelse == []
+
+        if is_atom(target):
+            match iter:
+                case ['range', stop]:
+                    init = ['=', target, 0]
+                    pred = ['<', target, stop]
+                    step = ['+=', target, 1]
+                case ['range', start, stop]:
+                    assert False
+                case ['range', start, stop, step]:
+                    assert False
+                case _:
+                    assert False
+        else:
+            assert False
+
+
+        cinit = self.compile_expression(init)
+        cpred = self.compile_expression(pred)
+        cstep = self.compile_expression(step)
+
         cbody = [self.compile_statement(s) for s in body]
         return f"for ({cinit}; {cpred}; {cstep})", cbody
 
