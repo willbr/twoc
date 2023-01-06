@@ -23,11 +23,10 @@ main(void) {
 # tests
 
 ```
-while
-do-while
+x while
 for
-continue
-break
+x continue
+x break
 
 if
 switch

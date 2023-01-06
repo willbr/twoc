@@ -502,6 +502,9 @@ class CompilationUnit():
 
         if head == 'compare':
             return self.compile_compare(*rest)
+        elif head in ['break', 'continue']:
+            assert rest == []
+            return head
 
         cargs = [self.compile_expression(a, depth+1) for a in rest]
 
