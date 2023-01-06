@@ -598,7 +598,9 @@ class CompilationUnit():
         #print(f"{name=}")
         t = type(name)
 
-        if t != str:
+        if t == bool:
+            return str(name).lower()
+        elif t != str:
             return str(name)
 
         if name == '':
