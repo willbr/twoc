@@ -562,6 +562,9 @@ class CompilationUnit():
                 return f"*({target})"
         elif head == "include-lib":
             return self.compile_lib(*args)
+        elif head == 'not':
+            assert len(cargs) == 1
+            return f"!{cargs[0]}"
         else:
             return f"{head}({', '.join(cargs)})"
 
