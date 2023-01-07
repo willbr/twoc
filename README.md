@@ -41,7 +41,7 @@ x if
 switch
 
 print macro
-struct
+struct/union, inherit from Struct or Union like ctypes
 typedef
 enum
 cast to type
@@ -59,11 +59,15 @@ server + client
 
 # areans
 
+# far arrays
+data, cap, len
+
 # python types
 
 * dict
 * list
 * set
+* interned strings
 
 # default argument values
 
