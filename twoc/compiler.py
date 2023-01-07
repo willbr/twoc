@@ -725,3 +725,21 @@ def print_func_decl(lines, name, params, returns, sep, end):
     lines.write(final)
 
 
+def compile_comment(comment):
+    r = f'/* {comment[1:-1]} */'
+    return r
+
+
+def compile_var(args, body):
+    assert body == []
+    num_args = len(args)
+    if num_args == 2:
+        var_name, var_type = args
+        return f"{var_type} {var_name}"
+    elif num_args == 3:
+        var_name, var_type, var_val = args
+        return f"{var_type} {var_name} = {var_val}"
+    else:
+        assert False
+
+
