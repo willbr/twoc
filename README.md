@@ -124,3 +124,13 @@ int a = 0;
 int__print(&a)
 ```
 
+# inver variable type on first use
+
+```python
+a = 128
+```
+
+```c
+int a = 128;
+```
+
