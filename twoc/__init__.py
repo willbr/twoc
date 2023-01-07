@@ -299,22 +299,9 @@ class CompilationUnit():
             self.top_level.append(decl + ";")
 
 
-    def compile_define(self, *args):
-        first_line, body = split_newline(args)
-        sep   = ""
-        dbody = ""
-        if body != ():
-            assert False
-        n = len(first_line)
-        if n == 1:
-            define_name = first_line[0]
-        elif n == 2:
-            define_name = first_line[0]
-            sep = " "
-            dbody = first_line[1]
-        else:
-            assert False
-        decl = f"#define {define_name}{sep}{dbody}"
+    def compile_define(self, name, body):
+        cbody = self.compile_expression(body)
+        decl = f"#define {name} {cbody}"
         self.top_level.append(decl)
 
 
