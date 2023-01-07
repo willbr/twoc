@@ -3,7 +3,6 @@
 from .compiler import CompilationUnit
 
 """
-remove split_newline
 remove references to ie/
 can I remove transform_infix
 remove keywords?

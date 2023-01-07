@@ -219,7 +219,7 @@ class CompilationUnit():
 
     def compile_typedef(self, type_name, *body):
         assert False
-        type_spec, rest = split_newline(body)
+        #type_spec, rest = split_newline(body)
         assert rest == ()
         decl = "typedef " + self.compile_var_decl(type_name, type_spec) + ";"
         self.top_level.append(decl)
@@ -272,7 +272,7 @@ class CompilationUnit():
     def compile_hash_if(self, *args):
         assert False
         lines = []
-        pred, body = split_newline(args)
+        #pred, body = split_newline(args)
         #cpred = self.compile_expression(transform_infix(pred))
         cbody = [self.compile_statement(s) for s in body]
 
@@ -307,12 +307,13 @@ class CompilationUnit():
 
 
     def compile_enum(self, *args):
-        first_line, enum_body = split_newline(args)
+        assert False
+        #first_line, enum_body = split_newline(args)
         assert len(first_line) == 1
         name = first_line[0]
         enum = []
         for x in enum_body:
-            line, body = split_newline(x)
+            #line, body = split_newline(x)
             assert len(line) == 1
             assert body == []
             enum.append(line[0])
