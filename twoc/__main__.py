@@ -37,16 +37,16 @@ def main():
     for file in args.file:
         cu.read_file(file)
 
-    code = cu.render()
 
     if args.run:
+        code = cu.render()
         run(code)
         return
 
     if args.outfile == None:
-        print(code)
+        cu.print()
     else:
-
+        code = cu.render()
         out_path = Path(args.outfile)
         if not out_path.parent.exists():
             raise FileNotFoundError(f"parent folder doesn't exist: {out_path.parent}")

@@ -1,6 +1,14 @@
 from unwind import unwind_file
 from pathlib import Path
 from .rope import Rope
+from rich.console import Console
+from rich.traceback import install
+
+install(show_locals=True)
+
+console = Console(markup=False)
+python_print = print
+print = console.print
 
 class CompilationUnit():
     def __init__(self, filename=None):
@@ -52,9 +60,10 @@ class CompilationUnit():
 
 
     def compile_keywords(self):
+        assert False
         escaped_keywords = ('keyword_' + x for x in self.keywords)
-        body = ([kw, 'ie/newline'] for kw in escaped_keywords)
-        x = ('enum', 'toco_keyword', 'ie/newline', *body)
+        #body = ([kw, 'ie/newline'] for kw in escaped_keywords)
+        #x = ('enum', 'toco_keyword', 'ie/newline', *body)
         self.compile(x)
 
         x = "typedef toco_keyword enum toco_keyword".split()
@@ -63,16 +72,7 @@ class CompilationUnit():
 
     def compile(self, x):
         if is_atom(x):
-            if x == 'ie/newline':
-                try:
-                    prev = self.top_level[-1]
-                except IndexError:
-                    prev = ''
-
-                if prev != '':
-                    self.top_level.append('')
-            else:
-                assert False
+            assert False
             return
 
         head, *args = x
@@ -100,8 +100,6 @@ class CompilationUnit():
             self.top_level.append(compile_comment(*args))
         elif head == 'enum':
             self.top_level.append(self.compile_enum(*args))
-        elif head == 'ie/newline':
-            assert args == []
         else:
             print(head)
             assert False
@@ -118,8 +116,9 @@ class CompilationUnit():
 
 
     def compile_import(self, lib_name, *body):
+        assert False
         filenames = [lib_name, lib_name + '.h.ie', lib_name + '.c.ie']
-        assert body == ('ie/newline',)
+        #assert body == ('ie/newline',)
         for lib_dir in self.lib_directories:
             for name in filenames:
                 path = os.path.join(lib_dir, name)
@@ -226,6 +225,7 @@ class CompilationUnit():
 
 
     def compile_struct(self, struct_name, *body):
+        assert False
         assert body[0] == 'ie/newline'
         assert len(body) > 1
         struct_spec = {}
@@ -244,16 +244,17 @@ class CompilationUnit():
 
 
     def compile_globals(self, body):
-        assert body[0] == 'ie/newline'
+        assert False
+        #assert body[0] == 'ie/newline'
         body.pop(0)
         for elem in body:
             assert len(elem) == 4
             var_name, let, x, nl = elem
             var_name = self.mangle(var_name)
             assert let == ':='
-            assert nl == 'ie/newline'
+            #assert nl == 'ie/newline'
             neoteric, var_type, var_initial = x
-            assert neoteric == 'ie/neoteric'
+            #assert neoteric == 'ie/neoteric'
             # print(var_initial)
             # print(x)
             decl = self.compile_var_decl(var_name, var_type, var_initial)
@@ -404,8 +405,6 @@ class CompilationUnit():
 
         if x == []:
             return []
-        elif x == ['ie/infix']:
-            return []
 
         head, *rest = x
 
@@ -422,59 +421,7 @@ class CompilationUnit():
         elif head == 'aug_assign':
             return self.compile_aug_assign_macro(*rest)
 
-        while head in ['ie/prefix', 'ie/infix', 'ie/postfix', 'ie/neoteric']:
-            if head == 'ie/prefix':
-                head, *rest = rest
-            elif head == 'ie/infix':
-                assert False
-                #nx = transform_infix(rest)
-                if is_atom(nx):
-                    return self.mangle(nx)
-                head, *rest = nx
-                if rest == []:
-                    return head
-            elif head == 'ie/postfix':
-                head = rest[-1]
-                rest = rest[:-1]
-            elif head == 'ie/neoteric':
-                assert len(rest) == 2
-                cmd, args = rest
-
-                if cmd == '*':
-                    cmd = 'deref'
-
-                if args[0] == 'ie/prefix':
-                    aname = rest[0]
-                    assert False
-                    #index = transform_infix(rest[1][1:])
-                    head, *rest = ['aref', aname, index]
-                elif args[0] == 'ie/infix':
-                    # print(1,[head, *rest])
-                    nargs = self.macro_expand(args)
-                    # print(2,nargs)
-                    if ',' in args:
-                        head, *rest = [cmd, *nargs]
-                    else:
-                        head, *rest = [cmd, nargs]
-
-                    # if len(args) == 2:
-                        # head, *rest = [cmd, nargs]
-                    # else:
-                        # head, *rest = [cmd, *nargs]
-                    # print(3,[head, *rest])
-                    # exit(1)
-                elif args[0] == 'ie/postfix':
-                    assert False
-                else:
-                    assert False
-                # print(x)
-                # print([head, *rest])
-                # exit(1)
-
-        nx = [head, *rest]
-        # print("x:", x)
-        # print("nx:", nx)
-        return nx
+        return x
 
 
     def compile_expression(self, x, depth=0):
@@ -536,14 +483,12 @@ class CompilationUnit():
 
 
     def compile_params(self, spec):
-        if spec[0] == 'ie/newline':
-            spec = spec[1:]
-
+        assert False
         params = []
         for param in spec:
             n = len(param)
             if len(param) == 3:
-                assert param.pop() == 'ie/newline'
+                assert False
 
             if n == 1:
                 if param[0] == 'void':
