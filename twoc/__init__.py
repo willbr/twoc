@@ -189,8 +189,8 @@ class CompilationUnit():
             return self.compile_while(*args)
         elif head == 'for':
             return self.compile_for(*args)
-        elif head == 'if':
-            return self.compile_if(*args)
+        elif head == 'cond':
+            return self.compile_cond(*args)
         elif head == 'comment':
             return compile_comment(*args, *body)
         elif head == 'return':
@@ -322,15 +322,24 @@ class CompilationUnit():
         return lines
 
 
-    def compile_if(self, pred, body, orelse):
+    def compile_cond(self, head, *clauses):
+        pred, body = head
         cpred = self.compile_expression(pred)
         cbody = [self.compile_statement(s) for s in body]
-        corelse = [self.compile_statement(s) for s in orelse]
 
         blocks = [cbody]
 
-        if corelse:
-            blocks.append(['else', corelse])
+        for clause in clauses:
+            clause_pred, clause_body = clause
+            c_clause_pred = self.compile_expression(clause_pred)
+            c_clause_body = [self.compile_statement(s) for s in clause_body]
+
+            if c_clause_pred == 'else':
+                s_pred = 'else'
+            else:
+                s_pred = f"else if ({c_clause_pred})"
+
+            blocks.append([s_pred, c_clause_body])
 
         return f"if ({cpred})", *blocks
 
