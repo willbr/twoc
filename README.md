@@ -24,7 +24,7 @@ main(void) {
 
 ```
 x while
-for
+x for
 x continue
 x break
 
@@ -34,12 +34,9 @@ switch
 print macro
 struct
 typedef
-link settings saved in file e.g. SDL
 enum
 cast to type
 goto & labels
-inline functions
-
 pointers
 arrays
 unions
@@ -53,13 +50,22 @@ server + client
 
 # areans
 
-# hash table
+# python types
 
-# lists
+* dict
+* list
+* set
 
 # default argument values
 
 # python match
 # python class
 # python with statement
+
+# store compiler settings inside the file
+
+link settings saved in file e.g. SDL
+
+# silly ideas
+swizzle rgb bgr like Odin?
 
