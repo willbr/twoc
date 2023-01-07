@@ -28,7 +28,7 @@ x for
 x continue
 x break
 
-if
+x if
 switch
 
 print macro
