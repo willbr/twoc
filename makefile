@@ -1,5 +1,5 @@
 all:
-	python -m twoc tests\for.c.py
+	python -m twoc tests\if.c.py
 
 wall:
 	watchexec -cr "make all"

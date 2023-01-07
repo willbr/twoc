@@ -132,7 +132,7 @@ class CompilationUnit():
             self.compile_typedef(*args)
         elif head == 'define':
             self.compile_define(*args)
-        elif head == 'hash-if':
+        elif head == 'hash_if':
             cx = self.compile_hash_if(*args)
             self.top_level.extend(cx)
         elif head == 'comment':
@@ -319,11 +319,17 @@ class CompilationUnit():
         return lines
 
 
-    def compile_if(self, pred, body):
-        npred = self.macro_expand(pred)
-        cpred = self.compile_expression(npred)
+    def compile_if(self, pred, body, orelse):
+        cpred = self.compile_expression(pred)
         cbody = [self.compile_statement(s) for s in body]
-        return f"if ({cpred})", cbody
+        corelse = [self.compile_statement(s) for s in orelse]
+
+        blocks = [cbody]
+
+        if corelse:
+            blocks.append(['else', corelse])
+
+        return f"if ({cpred})", *blocks
 
 
     def compile_enum(self, *args):
