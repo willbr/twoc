@@ -178,7 +178,10 @@ class CompilationUnit():
         #print(x)
 
         if is_atom(x):
-            assert False
+            if isinstance(x, str) and x[0] == '"':
+                return compile_comment(x)
+            else:
+                assert False
 
         head, *args = x
 
@@ -702,14 +705,9 @@ class CompilationUnit():
         print(self.render())
 
 
-def compile_comment(*args):
-    first_line, rest = split_newline(args)
-    comment_body = [repr(first_line)]
-    for line in rest:
-        comment_body += repr(line)
-    #todo escape */ in comment body
-    comment = '/* ' + ' '.join(comment_body) + ' */'
-    return comment
+def compile_comment(comment):
+    r = f'/* {comment[1:-1]} */'
+    return r
 
 
 def compile_returns(spec):
