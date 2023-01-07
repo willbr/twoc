@@ -52,6 +52,24 @@ unions
 
 ```
 
+# python syntax
+
+```
+in
+match
+class
+with
+is
+
+ctypes
+i = 42
+a = pointer(i)
+print(a.contents) deref
+addressof(i) or i.addressof
+byref
+cast(obj, type)
+```
+
 # repl
 
 add dependancy graph
@@ -70,10 +88,6 @@ data, cap, len
 * interned strings
 
 # default argument values
-
-# python match
-# python class
-# python with statement
 
 # store compiler settings inside the file
 
