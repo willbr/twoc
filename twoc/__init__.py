@@ -42,8 +42,3 @@ def compile_var(args, body):
         assert False
 
 
-def is_string_literal(s):
-    if len(s) < 2:
-        return False
-    return s[0] == '"' and s[-1] == '"'
-
