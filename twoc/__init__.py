@@ -789,7 +789,7 @@ def transform_infix(x):
         return transformed_sections
 
 
-def print_block(lines, body, depth):
+def print_block(lines: Rope, body, depth: int) -> None:
     indent = "    " * depth
 
     lines.write_line("{")
@@ -801,14 +801,21 @@ def print_block(lines, body, depth):
         if isinstance(s, str):
             lines.write_line(s)
         else:
-            head, sub = s
+            head, sub, *chain = s
             lines.write(head + " ")
             print_block(lines, sub, depth+1)
+            print_chain(lines, chain, depth)
             lines.write_line("")
 
     indent = "    " * (depth-1)
     lines.write(indent + "}")
 
+def print_chain(lines: Rope, chain, depth: int) -> None:
+    for link in chain:
+        head, sub, *sub_chain = link
+        lines.write(f" {head} ")
+        print_block(lines, sub, depth+1)
+        print_chain(lines, sub_chain, depth)
 
 def is_string_literal(s):
     if len(s) < 2:
