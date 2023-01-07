@@ -381,7 +381,7 @@ class CompilationUnit():
             except ValueError:
                 lhs, rhs = rhs, ''
             a, text = lhs.split("}")
-            t, fmt = a.rsplit(" ", 1)
+            t, fmt = a.rsplit(":", 1)
             vargs.append(t)
 
             if fmt[0] == '=':
