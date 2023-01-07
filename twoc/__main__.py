@@ -1,7 +1,6 @@
 import argparse
 
 from subprocess import Popen, PIPE
-from sys import argv
 from unwind import unwind_file
 from . import *
 
