@@ -100,6 +100,9 @@ class CompilationUnit():
             self.top_level.append(compile_comment(*args))
         elif head == 'enum':
             self.top_level.append(self.compile_enum(*args))
+        elif head == 'class':
+            cx = self.compile_class(*args)
+            self.top_level.extend(cx)
         else:
             print(head)
             assert False
@@ -279,6 +282,21 @@ class CompilationUnit():
             x = self.compile_statement(s)
             lines.append(f"    {x}")
         lines.append("#endif")
+        return lines
+
+    def compile_class(self, name, bases, keywords, body):
+        assert bases == []
+        assert keywords == []
+        lines = [f"typedef struct {name} {{"]
+        for elem in body:
+            match elem:
+                case ['ann_assign', elem_name, elem_type, elem_value]:
+                    assert elem_value == None
+                    decl = '    ' + self.compile_var_decl(elem_name, elem_type) + ";"
+                    lines.append(decl)
+                case _:
+                    assert False
+        lines.append(f'}} {name};')
         return lines
 
 
@@ -480,6 +498,8 @@ class CompilationUnit():
             c = rest[0].strip('"')
             assert len(c) == 1
             return f"'{c}'"
+        elif head == 'init_block':
+            return f"{{{', '.join(cargs)}}}"
         else:
             return f"{head}({', '.join(cargs)})"
 
