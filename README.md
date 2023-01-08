@@ -1,5 +1,7 @@
 # twoc
 
+a silly toy to compile python to c
+
 ```python
 include_lib("stdio.h")
 
@@ -77,7 +79,7 @@ server + client
 
 # areans
 
-# far arrays
+# fat arrays
 data, cap, len
 
 # python types
