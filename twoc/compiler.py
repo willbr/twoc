@@ -458,11 +458,11 @@ class CompilationUnit():
         elif head == "inc":
             assert len(cargs) == 1
             return f"{cargs[0]} += 1"
-        elif head == 'aref':
+        elif head == 'subscript':
             if len(cargs) != 2:
                 raise ValueError(f"{head=} {cargs=}")
             aname, aindex = cargs
-            if is_atom(args[0]):
+            if is_atom(rest[0]):
                 return f"{aname}[{aindex}]"
             else:
                 return f"({aname})[{aindex}]"
@@ -478,6 +478,11 @@ class CompilationUnit():
         elif head == 'not':
             assert len(cargs) == 1
             return f"!{cargs[0]}"
+        elif head == 'char':
+            assert len(rest) == 1
+            c = rest[0].strip('"')
+            assert len(c) == 1
+            return f"'{c}'"
         else:
             return f"{head}({', '.join(cargs)})"
 
