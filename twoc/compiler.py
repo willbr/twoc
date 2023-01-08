@@ -216,10 +216,7 @@ class CompilationUnit():
         return f"for ({cinit}; {cpred}; {cstep})", cbody
 
 
-    def compile_typedef(self, type_name, *body):
-        assert False
-        #type_spec, rest = split_newline(body)
-        assert rest == ()
+    def compile_typedef(self, type_name, type_spec):
         decl = "typedef " + self.compile_var_decl(type_name, type_spec) + ";"
         self.top_level.append(decl)
 
