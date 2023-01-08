@@ -6,7 +6,7 @@ def main():
         i += 1
         if i % 2 == 0:
             continue
-        print("{i d}")
+        print("{i:d}")
         if i >= 10:
             break
 
