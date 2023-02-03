@@ -184,29 +184,39 @@ class CompilationUnit():
         return f"while ({cpred})", cbody
 
 
-    def compile_for(self, target, iter, body, orelse):
+    def compile_range(self, target, iterator):
+        n = len(iterator)
+        if n == 2:
+            _, stop = iterator
+            init = ['=', target, 0]
+            pred = ['<', target, stop]
+            step = ['+=', target, 1]
+        elif n == 3:
+            _, start, stop = iterator
+            init = ['=', target, start]
+            pred = ['<', target, stop]
+            step = ['+=', target, 1]
+        elif n == 4:
+            _, start, stop, step = iterator
+            init = ['=', target, start]
+            pred = ['<', target, stop]
+            assert step != 0
+            if step > 0:
+                step = ['+=', target, step]
+            else:
+                step = ['-=', target, abs(step)]
+        else:
+            assert False
+        return init, pred, step
+
+    def compile_for(self, target, iterator, body, orelse):
         assert orelse == []
 
         if is_atom(target):
-            match iter:
-                case ['range', stop]:
-                    init = ['=', target, 0]
-                    pred = ['<', target, stop]
-                    step = ['+=', target, 1]
-                case ['range', start, stop]:
-                    init = ['=', target, start]
-                    pred = ['<', target, stop]
-                    step = ['+=', target, 1]
-                case ['range', start, stop, step]:
-                    init = ['=', target, start]
-                    pred = ['<', target, stop]
-                    assert step != 0
-                    if step > 0:
-                        step = ['+=', target, step]
-                    else:
-                        step = ['-=', target, abs(step)]
-                case _:
-                    assert False
+            if iterator[0] == 'range':
+                init, pred, step = self.compile_range(target, iterator)
+            else:
+                assert False
         else:
             assert False
 
@@ -289,13 +299,15 @@ class CompilationUnit():
         assert keywords == []
         lines = [f"typedef struct {name} {{"]
         for elem in body:
-            match elem:
-                case ['ann_assign', elem_name, elem_type, elem_value]:
-                    assert elem_value == None
-                    decl = '    ' + self.compile_var_decl(elem_name, elem_type) + ";"
-                    lines.append(decl)
-                case _:
-                    assert False
+            if not elem:
+                assert False
+            elif elem[0] == 'ann_assign':
+                _, elem_name, elem_type, elem_value = elem
+                assert elem_value == None
+                decl = '    ' + self.compile_var_decl(elem_name, elem_type) + ";"
+                lines.append(decl)
+            else:
+                assert False
         lines.append(f'}} {name};')
         return lines
 
