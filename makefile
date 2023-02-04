@@ -16,6 +16,9 @@ tests: FORCE
 wtests:
 	watchexec -cr "make tests"
 
+install:
+	python -m pip install -e .
+
 .PHONY: FORCE
 
 FORCE:
