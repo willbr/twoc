@@ -157,7 +157,7 @@ class CompilationUnit():
         elif head == 'comment':
             return compile_comment(*args, *body)
         elif head == 'return':
-            return self.compile_return_statement(*args, *body)
+            return self.compile_return_statement(*args)
         elif head == 'assign':
             ce = self.compile_expression(['=', *args]) + ';'
             return ce
@@ -351,8 +351,8 @@ class CompilationUnit():
         return '\n'.join(s)
 
 
-    def compile_return_statement(self, *args):
-        assert False
+    def compile_return_statement(self, args):
+        c = 'return ' + self.compile_expression(args) + ';'
         return c
 
 
