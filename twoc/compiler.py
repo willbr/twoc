@@ -399,7 +399,10 @@ class CompilationUnit():
         assert fmt[0] == '"' and fmt[-1] == '"'
         fmt = fmt[1:-1]
 
-        lhs, rhs = fmt.split("{",1)
+        try:
+            lhs, rhs = fmt.split("{",1)
+        except ValueError:
+            lhs, rhs = fmt, ''
         template = [lhs]
         vargs = []
         while rhs:
