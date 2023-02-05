@@ -1,11 +1,13 @@
 all:
-	python -m twoc tests/for.c.py
+	python -m twoc tests/functions.c.py
 
 wall:
 	watchexec -cr "make all"
 
 tests: FORCE
 	clear
+	python -m twoc tests/functions.c.py
+	python -m twoc tests/print.c.py
 	python -m twoc tests/if.c.py
 	python -m twoc tests/while.c.py
 	python -m twoc tests/for.c.py

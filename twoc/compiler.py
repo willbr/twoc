@@ -562,6 +562,13 @@ class CompilationUnit():
             _, alen, atype = var_type
             rhs = f"[{alen}]"
             var_type = atype
+        elif var_type[0] == 'subscript':
+            _, parent, child = var_type
+            if parent =='tuple' and child =='str':
+                var_type = 'char'
+                lhs = "**"
+            else:
+                assert False
         else:
             var_type = ' '.join(var_type)
 
@@ -626,7 +633,7 @@ class CompilationUnit():
             params, returns, body = spec
             if body == ():
                 continue
-            print_func_decl(lines, name, params, returns, ' ', ';')
+            self.print_func_decl(lines, name, params, returns, ' ', ';')
             lines.write_line("")
 
             func_decls += 1
@@ -644,7 +651,7 @@ class CompilationUnit():
                 continue
             if sep != None:
                 lines.write_line(sep)
-            print_func_decl(lines, name, params, returns, '\n', ' ')
+            self.print_func_decl(lines, name, params, returns, '\n', ' ')
 
             print_block(lines, body, 1)
             lines.write_line("")
@@ -656,6 +663,30 @@ class CompilationUnit():
 
     def print(self):
         print(self.render())
+
+
+    def print_func_decl(self, lines, name, params, returns, sep, end):
+        if params:
+            r = []
+            for param in params:
+                head, *tail = param
+                if head == 'args':
+                    for arg in tail:
+                        carg = self.compile_var_decl(*arg)
+                        r.append(carg)
+                else:
+                    assert False
+            cparams = ', '.join(r)
+        else:
+            cparams = 'void'
+        creturns = 'void' if returns == None else returns
+        code = f"{creturns}{sep}{name}({cparams}){end}"
+        *body, final = code.split('\n')
+
+        for l in body:
+            lines.write_line(l)
+
+        lines.write(final)
 
 
 def print_block(lines: Rope, body, depth: int) -> None:
@@ -693,36 +724,10 @@ def is_atom(x):
         return True
     return not hasattr(x, '__iter__')
 
-def print_func_decl(lines, name, params, returns, sep, end):
-    if params:
-        cparams = ', '.join(params)
-    else:
-        cparams = 'void'
-    creturns = 'void' if returns == None else returns
-    code = f"{creturns}{sep}{name}({cparams}){end}"
-    *body, final = code.split('\n')
-
-    for l in body:
-        lines.write_line(l)
-
-    lines.write(final)
 
 
 def compile_comment(comment):
     r = f'/* {comment[1:-1]} */'
     return r
-
-
-def compile_var(args, body):
-    assert body == []
-    num_args = len(args)
-    if num_args == 2:
-        var_name, var_type = args
-        return f"{var_type} {var_name}"
-    elif num_args == 3:
-        var_name, var_type, var_val = args
-        return f"{var_type} {var_name} = {var_val}"
-    else:
-        assert False
 
 
