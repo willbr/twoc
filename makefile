@@ -1,5 +1,5 @@
 all:
-	python -m twoc tests/functions.c.py
+	python -m twoc tests/pointers.c.py
 
 wall:
 	watchexec -cr "make all"

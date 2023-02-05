@@ -567,6 +567,9 @@ class CompilationUnit():
             if parent =='tuple' and child =='str':
                 var_type = 'char'
                 lhs = "**"
+            elif parent == 'pointer':
+                var_type = child
+                lhs = '*'
             else:
                 assert False
         else:
