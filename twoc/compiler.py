@@ -103,6 +103,9 @@ class CompilationUnit():
         elif head == 'class':
             cx = self.compile_class(*args)
             self.top_level.extend(cx)
+        elif head == 'ann_assign':
+            cx = self.compile_var(*args) + ";"
+            self.top_level.append(cx)
         else:
             print(head)
             assert False
