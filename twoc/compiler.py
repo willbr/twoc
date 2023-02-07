@@ -524,6 +524,8 @@ class CompilationUnit():
             return f"*{', '.join(cargs)}"
         elif head == 'addressof':
             return f"&{', '.join(cargs)}"
+        elif head == 'attribute':
+            assert False
         else:
             return f"{head}({', '.join(cargs)})"
 
