@@ -166,6 +166,8 @@ class CompilationUnit():
             return ce
         elif head == 'ann_assign':
             return self.compile_var(*args) + ";"
+        elif head == 'pass':
+            return ';'
 
         ce = self.compile_expression([head, *args])
         if head in ['include-lib']:

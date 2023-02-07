@@ -9,4 +9,5 @@ def main():
         print("{i:d}")
         if i >= 10:
             break
+    pass
 
