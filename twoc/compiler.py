@@ -518,6 +518,10 @@ class CompilationUnit():
             return f"'{c}'"
         elif head == 'init_block':
             return f"{{{', '.join(cargs)}}}"
+        elif head == 'contents':
+            return f"*{', '.join(cargs)}"
+        elif head == 'addressof':
+            return f"&{', '.join(cargs)}"
         else:
             return f"{head}({', '.join(cargs)})"
 
