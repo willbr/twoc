@@ -31,7 +31,7 @@ STDOUT:
 hi
 ```
 
-# tests
+## tests
 
 ```
 x while
@@ -54,7 +54,7 @@ unions
 
 ```
 
-# python syntax
+## python syntax
 
 ```
 in
@@ -72,49 +72,44 @@ byref
 cast(obj, type)
 ```
 
-# repl
-
-add dependancy graph
-server + client
-
-# areans
-
-# fat arrays
-data, cap, len
-
-# python types
+## python types
 
 * dict
 * list
 * set
 * interned strings
 
-# default argument values
+# threec
 
-# store compiler settings inside the file
+twoc is simple and ignorant
+
+threec will track contents and scope
+
+play with silly hacky ideas
+
+## repl
+
+add dependancy graph
+server + client
+
+## areans
+
+## fat arrays
+data, cap, len
+
+## default argument values
+
+## store compiler settings inside the file
 
 link settings saved in file e.g. SDL
 
-# silly ideas
+## silly ideas
 
-https://en.wikipedia.org/wiki/Swizzling_(computer_graphics)
+[wikipedia swizzling](https://en.wikipedia.org/wiki/Swizzling_(computer_graphics))
 
 swizzle rgb bgr like Odin?
 
-# Uniform Function Call Syntax
-
-https://en.wikipedia.org/wiki/Uniform_Function_Call_Syntax
-
-```python
-c = add(a, b)
-c = a.add(b)
-```
-
-```c
-c = add(a, b)
-c = add(a, b)
-```
-# Member functions
+## Member functions
 
 ```python
 a:int = 0
@@ -126,7 +121,7 @@ int a = 0;
 int__print(&a)
 ```
 
-# inver variable type on first use
+## inver variable type on first use
 
 ```python
 a = 128
