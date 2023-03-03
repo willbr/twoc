@@ -100,6 +100,12 @@ class CompilationUnit():
             self.top_level.append(compile_comment(*args))
         elif head == 'enum':
             self.top_level.append(self.compile_enum(*args))
+        elif head == 'class':
+            cx = self.compile_class(*args)
+            self.top_level.extend(cx)
+        elif head == 'ann_assign':
+            cx = self.compile_var(*args) + ";"
+            self.top_level.append(cx)
         else:
             print(head)
             assert False
@@ -154,12 +160,14 @@ class CompilationUnit():
         elif head == 'comment':
             return compile_comment(*args, *body)
         elif head == 'return':
-            return self.compile_return_statement(*args, *body)
+            return self.compile_return_statement(*args)
         elif head == 'assign':
             ce = self.compile_expression(['=', *args]) + ';'
             return ce
         elif head == 'ann_assign':
             return self.compile_var(*args) + ";"
+        elif head == 'pass':
+            return ';'
 
         ce = self.compile_expression([head, *args])
         if head in ['include-lib']:
@@ -181,29 +189,39 @@ class CompilationUnit():
         return f"while ({cpred})", cbody
 
 
-    def compile_for(self, target, iter, body, orelse):
+    def compile_range(self, target, iterator):
+        n = len(iterator)
+        if n == 2:
+            _, stop = iterator
+            init = ['=', target, 0]
+            pred = ['<', target, stop]
+            step = ['+=', target, 1]
+        elif n == 3:
+            _, start, stop = iterator
+            init = ['=', target, start]
+            pred = ['<', target, stop]
+            step = ['+=', target, 1]
+        elif n == 4:
+            _, start, stop, step = iterator
+            init = ['=', target, start]
+            pred = ['<', target, stop]
+            assert step != 0
+            if step > 0:
+                step = ['+=', target, step]
+            else:
+                step = ['-=', target, abs(step)]
+        else:
+            assert False
+        return init, pred, step
+
+    def compile_for(self, target, iterator, body, orelse):
         assert orelse == []
 
         if is_atom(target):
-            match iter:
-                case ['range', stop]:
-                    init = ['=', target, 0]
-                    pred = ['<', target, stop]
-                    step = ['+=', target, 1]
-                case ['range', start, stop]:
-                    init = ['=', target, start]
-                    pred = ['<', target, stop]
-                    step = ['+=', target, 1]
-                case ['range', start, stop, step]:
-                    init = ['=', target, start]
-                    pred = ['<', target, stop]
-                    assert step != 0
-                    if step > 0:
-                        step = ['+=', target, step]
-                    else:
-                        step = ['-=', target, abs(step)]
-                case _:
-                    assert False
+            if iterator[0] == 'range':
+                init, pred, step = self.compile_range(target, iterator)
+            else:
+                assert False
         else:
             assert False
 
@@ -216,10 +234,7 @@ class CompilationUnit():
         return f"for ({cinit}; {cpred}; {cstep})", cbody
 
 
-    def compile_typedef(self, type_name, *body):
-        assert False
-        #type_spec, rest = split_newline(body)
-        assert rest == ()
+    def compile_typedef(self, type_name, type_spec):
         decl = "typedef " + self.compile_var_decl(type_name, type_spec) + ";"
         self.top_level.append(decl)
 
@@ -284,6 +299,23 @@ class CompilationUnit():
         lines.append("#endif")
         return lines
 
+    def compile_class(self, name, bases, keywords, body):
+        assert bases == []
+        assert keywords == []
+        lines = [f"typedef struct {name} {{"]
+        for elem in body:
+            if not elem:
+                assert False
+            elif elem[0] == 'ann_assign':
+                _, elem_name, elem_type, elem_value = elem
+                assert elem_value == None
+                decl = '    ' + self.compile_var_decl(elem_name, elem_type) + ";"
+                lines.append(decl)
+            else:
+                assert False
+        lines.append(f'}} {name};')
+        return lines
+
 
     def compile_cond(self, head, *clauses):
         pred, body = head
@@ -324,8 +356,8 @@ class CompilationUnit():
         return '\n'.join(s)
 
 
-    def compile_return_statement(self, *args):
-        assert False
+    def compile_return_statement(self, args):
+        c = 'return ' + self.compile_expression(args) + ';'
         return c
 
 
@@ -372,7 +404,10 @@ class CompilationUnit():
         assert fmt[0] == '"' and fmt[-1] == '"'
         fmt = fmt[1:-1]
 
-        lhs, rhs = fmt.split("{",1)
+        try:
+            lhs, rhs = fmt.split("{",1)
+        except ValueError:
+            lhs, rhs = fmt, ''
         template = [lhs]
         vargs = []
         while rhs:
@@ -458,11 +493,11 @@ class CompilationUnit():
         elif head == "inc":
             assert len(cargs) == 1
             return f"{cargs[0]} += 1"
-        elif head == 'aref':
+        elif head == 'subscript':
             if len(cargs) != 2:
                 raise ValueError(f"{head=} {cargs=}")
             aname, aindex = cargs
-            if is_atom(args[0]):
+            if is_atom(rest[0]):
                 return f"{aname}[{aindex}]"
             else:
                 return f"({aname})[{aindex}]"
@@ -478,6 +513,19 @@ class CompilationUnit():
         elif head == 'not':
             assert len(cargs) == 1
             return f"!{cargs[0]}"
+        elif head == 'char':
+            assert len(rest) == 1
+            c = rest[0].strip('"')
+            assert len(c) == 1
+            return f"'{c}'"
+        elif head == 'init_block':
+            return f"{{{', '.join(cargs)}}}"
+        elif head == 'contents':
+            return f"*{', '.join(cargs)}"
+        elif head == 'addressof':
+            return f"&{', '.join(cargs)}"
+        elif head == 'attribute':
+            assert False
         else:
             return f"{head}({', '.join(cargs)})"
 
@@ -525,6 +573,16 @@ class CompilationUnit():
             _, alen, atype = var_type
             rhs = f"[{alen}]"
             var_type = atype
+        elif var_type[0] == 'subscript':
+            _, parent, child = var_type
+            if parent =='tuple' and child =='str':
+                var_type = 'char'
+                lhs = "**"
+            elif parent == 'pointer':
+                var_type = child
+                lhs = '*'
+            else:
+                assert False
         else:
             var_type = ' '.join(var_type)
 
@@ -589,7 +647,7 @@ class CompilationUnit():
             params, returns, body = spec
             if body == ():
                 continue
-            print_func_decl(lines, name, params, returns, ' ', ';')
+            self.print_func_decl(lines, name, params, returns, ' ', ';')
             lines.write_line("")
 
             func_decls += 1
@@ -607,7 +665,7 @@ class CompilationUnit():
                 continue
             if sep != None:
                 lines.write_line(sep)
-            print_func_decl(lines, name, params, returns, '\n', ' ')
+            self.print_func_decl(lines, name, params, returns, '\n', ' ')
 
             print_block(lines, body, 1)
             lines.write_line("")
@@ -619,6 +677,30 @@ class CompilationUnit():
 
     def print(self):
         print(self.render())
+
+
+    def print_func_decl(self, lines, name, params, returns, sep, end):
+        if params:
+            r = []
+            for param in params:
+                head, *tail = param
+                if head == 'args':
+                    for arg in tail:
+                        carg = self.compile_var_decl(*arg)
+                        r.append(carg)
+                else:
+                    assert False
+            cparams = ', '.join(r)
+        else:
+            cparams = 'void'
+        creturns = 'void' if returns == None else returns
+        code = f"{creturns}{sep}{name}({cparams}){end}"
+        *body, final = code.split('\n')
+
+        for l in body:
+            lines.write_line(l)
+
+        lines.write(final)
 
 
 def print_block(lines: Rope, body, depth: int) -> None:
@@ -656,36 +738,10 @@ def is_atom(x):
         return True
     return not hasattr(x, '__iter__')
 
-def print_func_decl(lines, name, params, returns, sep, end):
-    if params:
-        cparams = ', '.join(params)
-    else:
-        cparams = 'void'
-    creturns = 'void' if returns == None else returns
-    code = f"{creturns}{sep}{name}({cparams}){end}"
-    *body, final = code.split('\n')
-
-    for l in body:
-        lines.write_line(l)
-
-    lines.write(final)
 
 
 def compile_comment(comment):
     r = f'/* {comment[1:-1]} */'
     return r
-
-
-def compile_var(args, body):
-    assert body == []
-    num_args = len(args)
-    if num_args == 2:
-        var_name, var_type = args
-        return f"{var_type} {var_name}"
-    elif num_args == 3:
-        var_name, var_type, var_val = args
-        return f"{var_type} {var_name} = {var_val}"
-    else:
-        assert False
 
 
