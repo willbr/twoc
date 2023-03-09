@@ -515,8 +515,9 @@ class CompilationUnit():
             return f"!{cargs[0]}"
         elif head == 'char':
             assert len(rest) == 1
-            c = rest[0].strip('"')
-            assert len(c) == 1
+            c = repr(rest[0])[2:-2]
+            c = c.replace('\\x00', '\\0')
+            assert len(c) <= 2
             return f"'{c}'"
         elif head == 'init_block':
             return f"{{{', '.join(cargs)}}}"
