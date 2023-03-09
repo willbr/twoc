@@ -576,9 +576,15 @@ class CompilationUnit():
             var_type = atype
         elif var_type[0] == 'subscript':
             _, parent, child = var_type
-            if parent =='tuple' and child =='str':
-                var_type = 'char'
-                lhs = "**"
+            if parent =='tuple':
+                if child =='str':
+                    var_type = 'char'
+                    lhs = "**"
+                elif child == 'char':
+                    var_type = 'char'
+                    lhs = "*"
+                else:
+                    assert False
             elif parent == 'pointer':
                 var_type = child
                 lhs = '*'

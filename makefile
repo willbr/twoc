@@ -1,11 +1,12 @@
 all:
-	python -m twoc tests/struct.c.py
+	python -m twoc tests/string.c.py
 
 wall:
 	watchexec -cr "make all"
 
 tests: FORCE
 	clear
+	python -m twoc tests/string.c.py
 	python -m twoc tests/struct.c.py
 	python -m twoc tests/pointers.c.py
 	python -m twoc tests/variables.c.py
