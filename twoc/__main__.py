@@ -8,7 +8,7 @@ from .compiler import print
 
 def run(code):
     process = Popen(
-            ['tcc', '-run', '-', '-Wall'],
+            ['tcc', '-Wall', '-run', '-'],
             stdin=PIPE,
             stdout=PIPE)
 
